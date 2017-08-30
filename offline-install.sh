@@ -1,7 +1,6 @@
 #!/bin/bash
 STILL_DEPENDENCIES=true
 PACKAGE=$1
-
 if [ -z $PACKAGE ]; then
     echo "No package passed." 2>&1
    exit 1
@@ -33,11 +32,14 @@ yum install --downloadonly --downloaddir=/tmp/$PACKAGE $PACKAGE &> /tmp/offline_
 while $STILL_DEPENDENCIES; do 
     dl_dependencies
 done
-rm -f /tmp/$PACKAGE/output
-mv /tmp/offline_install_output.log /tmp/$PACKAGE/offline_install_output.log
+rm -f /tmp/offline_install_output
+rm -f /tmp/offline_install_output.log
 rm -f /tmp/yum_save*
 ls /tmp/$PACKAGE | grep 'i686' | while read line; do
-    echo "removing $line! (not needed)"
+    echo "Removing $line! (not needed)"
     rm -f /tmp/$PACKAGE/$line
 done
-echo "Dependancies for $PACKAGE are downloaded at /tmp/$PACKAGE."
+tar -czvf $PACKAGE.tar.gz /tmp/$PACKAGE &> /tmp/offline_install_output.log
+rm -f /tmp/offline_install_output.log
+rm -r -f /tmp/$PACKAGE
+echo "$PACKAGE.tar.gz has been created."
